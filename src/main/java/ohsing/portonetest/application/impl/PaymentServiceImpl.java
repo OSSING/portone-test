@@ -44,6 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
 
+    // 결제 고유 번호와 주문 고유 번호를 통해 정상적인 결제인지 검증
     @Override
     public IamportResponse<Payment> paymentByCallback(PaymentCallbackRequest request) {
         try {
