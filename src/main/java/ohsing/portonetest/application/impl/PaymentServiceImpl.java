@@ -6,6 +6,7 @@ import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ohsing.portonetest.application.service.PaymentService;
 import ohsing.portonetest.domain.entity.Order;
 import ohsing.portonetest.domain.entity.PaymentStatus;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -50,6 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             // 결제 단건 조회 (포트원)
             IamportResponse<Payment> iamportResponse = iamportClient.paymentByImpUid(request.getPaymentUid());
+            log.info("iamportResponse : {}", iamportResponse.toString());
 
             // 주문 내역 조회
             Order order = orderRepository.findOrderAndPayment(request.getOrderUid())

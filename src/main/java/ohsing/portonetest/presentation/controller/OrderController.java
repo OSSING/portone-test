@@ -36,13 +36,14 @@ public class OrderController {
         Member member = memberService.autoRegister();
         Order order = orderService.autoOrder(member);
 
-        String message = "주문 실패";
+        String message = "주문실패";
         if (order != null) {
-            message = "주문 성공";
+            message = "주문성공";
         }
 
         String encode = URLEncoder.encode(message, StandardCharsets.UTF_8);
 
-        return "redirect:/order?message=" + encode + "&orderUid=" + order.getOrderUid();
+        assert order != null;
+        return "redirect:/order?message="+encode+"&orderUid="+order.getOrderUid();
     }
 }

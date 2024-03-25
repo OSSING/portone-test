@@ -8,13 +8,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "orders")
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "orders")
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,5 +40,4 @@ public class Order {
         this.member = member;
         this.payment = payment;
     }
-
 }

@@ -11,7 +11,7 @@
       <input type="submit" value="주문하기">
     </div>
     <div style="margin-top: 20px">
-      <a th:href="@{/payment/{orderUid} (orderUid=${orderUid}))">결제 페이지로 이동</a>
+      <a th:href="@{/payment/{orderUid} (orderUid=${orderUid})}">결제 페이지로 이동</a>
     </div>
     <p th:text="${message}"></p>
   </form>
