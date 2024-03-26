@@ -33,6 +33,7 @@ dependencies {
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
 
 	// 아임포트(포트원) 관련
 	// https://mvnrepository.com/artifact/com.github.iamport/iamport-rest-client-java
