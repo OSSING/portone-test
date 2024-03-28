@@ -79,7 +79,7 @@ public class PaymentServiceImpl implements PaymentService {
                 orderRepository.delete(order);
                 paymentRepository.delete(order.getPayment());
 
-                // 결제금액 위변조로 의심되는 결제 금액을 취소 (포트원)
+                // 결제금액 위변조로 의심되는 결제를 취소 (포트원)
                 iamportClient.cancelPaymentByImpUid(new CancelData(iamportResponse.getResponse().getImpUid(), true, new BigDecimal(iamportPrice)));
 
                 throw new RuntimeException("결제금액 위변조 의심이 감지되었습니다.");

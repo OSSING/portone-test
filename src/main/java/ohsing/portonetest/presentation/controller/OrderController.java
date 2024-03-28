@@ -1,6 +1,7 @@
 package ohsing.portonetest.presentation.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ohsing.portonetest.application.service.MemberService;
 import ohsing.portonetest.application.service.OrderService;
 import ohsing.portonetest.domain.entity.Member;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class OrderController {
@@ -25,6 +27,7 @@ public class OrderController {
     public String order(@RequestParam(name = "message", required = false) String message,
                         @RequestParam(name = "orderUid", required = false) String id,
                         Model model) {
+
         model.addAttribute("message", message);
         model.addAttribute("orderUid", id);
 
@@ -33,6 +36,9 @@ public class OrderController {
 
     @PostMapping("/order")
     public String autoOrder() {
+
+        log.info("주문하기 버튼 클릭");
+
         Member member = memberService.autoRegister();
         Order order = orderService.autoOrder(member);
 

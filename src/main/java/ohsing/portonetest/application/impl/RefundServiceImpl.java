@@ -2,6 +2,11 @@ package ohsing.portonetest.application.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.siot.IamportRestClient.IamportClient;
+import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.request.CancelData;
+import com.siot.IamportRestClient.response.IamportResponse;
+import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ohsing.portonetest.application.service.RefundService;
@@ -10,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Map;
 
@@ -19,9 +25,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RefundServiceImpl implements RefundService {
 
+    private final IamportClient iamportClient;
+
     // AccessToken과 주문 정보, 환불 사유를 포트원에 요청하여 결제 취소 처리하는 메서드
     @Override
-    public void refundRequest(String accessToken, String merchant_uid, String reason) throws IOException {
+    public void refundRequestHttp(String accessToken, String merchant_uid, String reason) throws IOException {
         URL url = new URL("https://api.iamport.kr/payments/cancel");
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
@@ -53,6 +61,30 @@ public class RefundServiceImpl implements RefundService {
         conn.disconnect();
 
         log.info("결제 취소 완료!! 주문 번호 : {} ", merchant_uid);
+    }
+
+    @Override
+    public String refundRequest(String imp_uid) throws IamportResponseException, IOException {
+
+        // 결제 단건 조회 (포트원)
+        IamportResponse<Payment> iamportResponse = iamportClient.paymentByImpUid(imp_uid);
+        log.info("결제 단건 조회 결과 : {}", iamportResponse.toString());
+
+        // 결제된 가격 조회
+        int iamportPrice = iamportResponse.getResponse().getAmount().intValue();
+
+        // 결제 취소 (포트원)
+        // new BigDecimal(iamportPrice) 부분은 얼마를 환불해줄지 정하는 부분이며, CheckSum을 받아 포트원에서 처리한다.
+        IamportResponse<Payment> cancelResponse =
+                iamportClient.cancelPaymentByImpUid(new CancelData(iamportResponse.getResponse().getImpUid(), true, new BigDecimal(iamportPrice)));
+
+        log.info("결제 취소 결과 : {}", cancelResponse.toString());
+
+        if (cancelResponse.getCode() == 0) {
+            return "결제 취소가 성공적으로 완료되었습니다! : " + cancelResponse.getMessage();
+        } else {
+            return "결제 취소에 실패하였습니다! : " + cancelResponse.getMessage();
+        }
     }
 
     // 포트원에 apiKey와 secretKey를 요청하여 반환 받은 AccessToken을 반환하는 메서드

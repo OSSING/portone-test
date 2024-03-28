@@ -1,10 +1,12 @@
 package ohsing.portonetest.presentation.controller;
 
+import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ohsing.portonetest.application.service.PaymentService;
+import ohsing.portonetest.application.service.RefundService;
 import ohsing.portonetest.presentation.dto.PaymentCallbackRequest;
 import ohsing.portonetest.presentation.dto.RequestPayDto;
 import org.springframework.http.HttpStatus;
@@ -13,12 +15,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final RefundService refundService;
 
     // 결제 요청 데이터 조회
     @GetMapping("/payment/{id}")
@@ -41,13 +46,26 @@ public class PaymentController {
         return new ResponseEntity<>(iamportResponse, HttpStatus.OK);
     }
 
+    // 결제 취소 테스트를 위해 결제가 완료되면 결제 고유번호 전송
     @GetMapping("/success-payment")
-    public String successPaymentPage() {
+    public String successPaymentPage(@RequestParam("imp_uid") String imp_uid,
+                                     Model model) {
+        model.addAttribute("imp_uid", imp_uid);
         return "success-payment";
     }
 
     @GetMapping("/fail-payment")
     public String failPaymentPage() {
         return "fail-payment";
+    }
+
+    // 결제 취소 결과를 반환
+    @PostMapping("/payment/refund")
+    public String paymentRefund(@RequestParam("imp_uid") String imp_uid, Model model) throws IamportResponseException, IOException {
+        log.info("받은 imp_uid : {}", imp_uid);
+        String cancelResult = refundService.refundRequest(imp_uid);
+        model.addAttribute("cancelResult", cancelResult);
+
+        return "refund";
     }
 }

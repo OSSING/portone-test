@@ -33,5 +33,4 @@ public class Payment {
         this.status = status;
         this.paymentUid = paymentUid;
     }
-
 }
